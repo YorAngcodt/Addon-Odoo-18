@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Category Form View -->
+    <record id="view_asset_category_form" model="ir.ui.view">
+        <field name="name">fits.asset.category.form</field>
+        <field name="model">fits.asset.category</field>
+        <field name="arch" type="xml">
+            <form string="Kategori Aset">
+                <sheet>
+                    <!-- Header section with Main Asset in center and Name on the side -->
+                    <div style="display: flex; align-items: center; margin-bottom: 16px; gap: 20px;">
+                        <div style="width: 200px;">
+                            <field name="name" placeholder="Nama Kategori..."/>
+                        </div>
+                        <div style="flex: 1; text-align: center;">
+                            <field name="main_asset_id" string="Main Asset" context="{'show_code': True, 'asset_category_context': True}" required="1" placeholder="Pilih Main Asset..."/>
+                        </div>
+                    </div>
+                    
+                    <!-- Category code field below -->
+                    <group>
+                        <field name="category_code" placeholder="Kode Kategori..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Category List View -->
+    <record id="view_asset_category_list" model="ir.ui.view">
+        <field name="name">fits.asset.category.list</field>
+        <field name="model">fits.asset.category</field>
+        <field name="arch" type="xml">
+            <list string="Daftar Kategori Aset" editable="bottom">
+                <field name="category_code"/>
+                 <field name="main_asset_id" string="Main Asset" context="{'show_code': True, 'asset_category_context': True}"/>
+                <field name="name"/>             
+            </list>
+        </field>
+    </record>
+
+    <!-- Category Action -->
+    <record id="action_asset_category" model="ir.actions.act_window">
+        <field name="name">Asset Category</field>
+        <field name="res_model">fits.asset.category</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'show_code': True}</field>
+    </record>
+</odoo>

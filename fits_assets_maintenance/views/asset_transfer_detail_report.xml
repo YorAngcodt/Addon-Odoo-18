@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_asset_transfer_detail">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <h2 style="text-align:center; margin-bottom:20px;">Asset Transfers Report</h2>
+                    <table class="table table-sm" style="width:100%; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th style="border:1px solid #ddd; padding:6px; text-align:center;">No</th>
+                                <th style="border:1px solid #ddd; padding:6px;">Code Asset</th>
+                                <th style="border:1px solid #ddd; padding:6px;">Asset</th>
+                                <th style="border:1px solid #ddd; padding:6px;">Category</th>
+                                <th style="border:1px solid #ddd; padding:6px;">Date</th>
+                                <th style="border:1px solid #ddd; padding:6px;">From</th>
+                                <th style="border:1px solid #ddd; padding:6px;">To</th>
+                                <th style="border:1px solid #ddd; padding:6px;">Responsible Person</th>
+                                <th style="border:1px solid #ddd; padding:6px;">To Responsible Person</th>
+                                <th style="border:1px solid #ddd; padding:6px;">State</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-set="i" t-value="0"/>
+                            <t t-foreach="docs" t-as="trf">
+                                <t t-set="i" t-value="i + 1"/>
+                                <tr>
+                                    <td style="border:1px solid #ddd; padding:6px; text-align:center;" t-esc="i"/>
+                                    <td style="border:1px solid #ddd; padding:6px;" t-esc="trf.asset_code or trf.asset_id.serial_number_code or ''"/>
+                                    <td style="border:1px solid #ddd; padding:6px;" t-esc="trf.asset_id.asset_name or trf.asset_id.display_name or ''"/>
+                                    <td style="border:1px solid #ddd; padding:6px;" t-esc="trf.asset_id.category_id.name or ''"/>
+                                    <td style="border:1px solid #ddd; padding:6px;" t-esc="trf.transfer_date or ''"/>
+                                    <td style="border:1px solid #ddd; padding:6px;" t-esc="trf.from_location or ''"/>
+                                    <td style="border:1px solid #ddd; padding:6px;" t-esc="trf.to_location.location_name or ''"/>
+                                    <td style="border:1px solid #ddd; padding:6px;" t-esc="trf.current_responsible_person or ''"/>
+                                    <td style="border:1px solid #ddd; padding:6px;" t-esc="trf.to_responsible_person.name or ''"/>
+                                    <td style="border:1px solid #ddd; padding:6px;" t-esc="trf.state or ''"/>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_asset_transfer_detail" model="ir.actions.report">
+        <field name="name">Asset Transfers Detail Report</field>
+        <field name="model">fits.asset.transfer</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">fits_assets_maintenance.report_asset_transfer_detail</field>
+        <field name="report_file">fits_assets_maintenance.report_asset_transfer_detail</field>
+    </record>
+</odoo>

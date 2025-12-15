@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Asset Form View -->
+    <record id="view_asset_form" model="ir.ui.view">
+        <field name="name">fits.asset.form</field>
+        <field name="model">fits.asset</field>
+        <field name="arch" type="xml">
+            <form string="Asset">
+                <header>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,active,maintenance"/>
+                    <button name="action_set_to_draft" type="object" string="Set to draft"
+                            groups="fits_assets_maintenance.group_fits_asset_maintenance_manager"
+                            invisible="status in ['draft', 'maintenance']"
+                            class="btn-secondary"/>
+                    <button name="action_set_to_active" type="object" string="Active"
+                            groups="fits_assets_maintenance.group_fits_asset_maintenance_manager"
+                            invisible="status not in ['draft']"
+                            class="btn-primary"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box d-flex justify-content-center" name="button_box">
+                        <button name="action_view_maintenance_requests" type="object" class="oe_stat_button" icon="fa-wrench">
+                            <span class="o_stat_text">Maintenance</span>
+                        </button>
+                        <button name="action_view_maintenance_calendar" type="object" class="oe_stat_button" icon="fa-calendar">
+                            <span class="o_stat_text">Schedule</span>
+                        </button>
+                    </div>
+                    <!-- Header section with image, asset name, and main asset in center -->
+                    <div style="display: flex; align-items: center; margin-bottom: 16px; gap: 20px;">
+                        <div>
+                            <field name="image_1920" widget="image" class="oe_avatar"/>
+                        </div>
+                        <div style="width: 250px;">
+                            <field name="asset_name" placeholder="Asset Name.." readonly="status in ['active', 'maintenance']"/>
+                        </div>
+                    </div>
+                    <!-- Main content area without Kode Asset section - now moved to Asset Information group -->
+                    <group>
+                        <group string="Asset Information">
+                            <field name="main_asset_selection" string="Main Asset" placeholder="Pilih main asset..." readonly="status in ['active', 'maintenance']"/>
+                            <field name="category_id" string="Asset Category" placeholder="Pilih Asset Category..." domain="category_domain" readonly="status in ['active', 'maintenance']"/>
+                            <field name="location_asset_selection" string="Location Assets" placeholder="Pilih Location Assets..." readonly="status in ['active', 'maintenance']"/>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="font-weight: bold; white-space: nowrap;">Kode Asset:</span>
+                                <field name="serial_number_code" string="Serial Number" readonly="1" style="flex: 1;"/>
+                                <button name="generate_code" type="object" string="Generate" class="btn-primary" style="padding: 4px 8px; font-size: 12px; height: 24px;" 
+                                        groups="fits_assets_maintenance.group_fits_asset_maintenance_manager"
+                                        invisible="status != 'draft'"/>
+                                <button name="generate_qr_code" type="object" string="QR Code" class="btn-secondary" style="padding: 4px 8px; font-size: 12px; height: 24px;" invisible="status not in ['draft', 'active', 'maintenance']"/>
+                            </div>
+                        </group>
+                        <group string="Status &amp; Condition">
+                            <field name="status" readonly="1" string="Current Status"/>
+                            <field name="condition" readonly="status in ['active', 'maintenance']"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Acquisition Information">
+                            <field name="acquisition_date" readonly="status in ['active', 'maintenance']"/>
+                            <field name="purchase_reference" readonly="status in ['active', 'maintenance']"/>
+                            <field name="supplier_id" readonly="1"/>
+                            <field name="acquisition_cost" readonly="status in ['active', 'maintenance']"/>
+                        </group>
+                        <group string="Warranty">
+                            <field name="warranty_start_date" readonly="status in ['active', 'maintenance']"/>
+                            <field name="warranty_end_date" readonly="status in ['active', 'maintenance']"/>
+                            <field name="warranty_provider" readonly="status in ['active', 'maintenance']"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <group string="Location &amp; Person responsible">
+                            <field name="company_id" readonly="status in ['active', 'maintenance']"/>
+                            <field name="department_id" readonly="status in ['active', 'maintenance']"/>
+                            <field name="responsible_person_id" readonly="status in ['active', 'maintenance']"/>
+                        </group>
+                        <group string="Notes &amp; Documentation">
+                            <field name="warranty_notes" placeholder="Warranty notes..." readonly="status in ['active', 'maintenance']"/>
+                            <field name="notes" placeholder="Notes / Description..." readonly="status in ['active', 'maintenance']"/>
+                            <field name="attachment_ids" widget="many2many_binary" string="Dokumen Pendukung" nolabel="1" readonly="status in ['active', 'maintenance']"/>
+                        </group>
+                    </group>
+
+                    <!-- Maintenance Schedule in Notebook -->
+                    <notebook>
+                        <page string="Maintenance Schedule">
+                            <group>
+                                <group string="Maintenance Information">
+                                    <field name="maintenance_required" readonly="not can_edit_maintenance or status in ['draft', 'maintenance']"/>
+                                    <!-- Field next_maintenance_date dinonaktifkan -->
+                                    <field name="next_maintenance_date" invisible="1"/>
+                                </group>
+                                <group string="Recurrence Settings">
+                                    <!-- For Managers and Team -->
+                                    <field name="recurrence_pattern" string="Pattern" 
+                                        readonly="not maintenance_required or status == 'maintenance'"
+                                        groups="fits_assets_maintenance.group_fits_asset_maintenance_manager,fits_assets_maintenance.group_fits_maintenance_team"/>
+                                    <field name="recurrence_start_date" string="Start Date" 
+                                        readonly="not maintenance_required or status == 'maintenance'"
+                                        groups="fits_assets_maintenance.group_fits_asset_maintenance_manager,fits_assets_maintenance.group_fits_maintenance_team"/>
+                                    <field name="recurrence_interval" string="Interval (days)"
+                                        readonly="not maintenance_required or recurrence_end_date or status == 'maintenance'"
+                                        groups="fits_assets_maintenance.group_fits_asset_maintenance_manager,fits_assets_maintenance.group_fits_maintenance_team"/>
+                                    <field name="recurrence_end_date" string="End Date"
+                                        readonly="not maintenance_required or recurrence_interval or status == 'maintenance'"
+                                        groups="fits_assets_maintenance.group_fits_asset_maintenance_manager,fits_assets_maintenance.group_fits_maintenance_team"/>
+                                        
+                                    <!-- For Regular Users (Read-only) -->
+                                    <field name="recurrence_pattern" string="Pattern" 
+                                        readonly="1"
+                                        groups="!fits_assets_maintenance.group_fits_asset_maintenance_manager,!fits_assets_maintenance.group_fits_maintenance_team"/>
+                                    <field name="recurrence_start_date" string="Start Date" 
+                                        readonly="1"
+                                        groups="!fits_assets_maintenance.group_fits_asset_maintenance_manager,!fits_assets_maintenance.group_fits_maintenance_team"/>
+                                    <field name="recurrence_interval" string="Interval (days)"
+                                        readonly="1"
+                                        groups="!fits_assets_maintenance.group_fits_asset_maintenance_manager,!fits_assets_maintenance.group_fits_maintenance_team"/>
+                                    <field name="recurrence_end_date" string="End Date"
+                                        readonly="1"
+                                        groups="!fits_assets_maintenance.group_fits_asset_maintenance_manager,!fits_assets_maintenance.group_fits_maintenance_team"/>
+
+                                    <div groups="fits_assets_maintenance.group_fits_asset_maintenance_manager,fits_assets_maintenance.group_fits_maintenance_team">
+                                        <button name="generate_maintenance_schedule" type="object" 
+                                                string="Generate Schedule" 
+                                                class="btn-primary"
+                                                invisible="not maintenance_required or recurrence_pattern == 'none'"
+                                                help="Generate maintenance calendar events based on recurrence settings"/>
+                                    </div>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <!-- Chatter untuk komunikasi dan tracking -->
+                <chatter>
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                    <field name="activity_ids"/>
+                </chatter>
+            </form>
+        </field>
+    </record>
+
+    <!-- Asset List View -->
+    <record id="view_asset_list" model="ir.ui.view">
+        <field name="name">fits.asset.list</field>
+        <field name="model">fits.asset</field>
+        <field name="arch" type="xml">
+            <list string="Assets">
+                <field name="asset_name"/>
+                <field name="main_asset_selection" string="Main Asset"/>
+                <field name="category_id"/>
+                <field name="location_asset_selection" string="Location Assets"/>
+                <field name="serial_number_code" string="Kode Asset"/>
+                <field name="status" widget="badge" decoration-success="status == 'active'" decoration-warning="status == 'maintenance'" decoration-danger="status == 'disposed'"/>
+                <field name="condition"/>
+                <field name="recurrence_pattern" invisible="1"/>
+                <field name="next_maintenance_date" invisible="status != 'maintenance'"/>
+                <field name="responsible_person_id"/>
+                <field name="company_id"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Asset Kanban View -->
+    <record id="view_asset_kanban" model="ir.ui.view">
+        <field name="name">fits.asset.kanban</field>
+        <field name="model">fits.asset</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" card_width="300">
+                <field name="asset_name"/>
+                <field name="main_asset_selection"/>
+                <field name="category_id"/>
+                <field name="location_asset_selection"/>
+                <field name="status"/>
+                <field name="condition"/>
+                <field name="responsible_person_id"/>
+                <field name="serial_number_code"/>
+                <field name="image_1920"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click" style="min-height: 200px; max-width: 300px;">
+                            <!-- Card Header with Image and Basic Info -->
+                            <div class="row mb-3">
+                                <div class="col-5 pr-2">
+                                    <div class="o_kanban_image">
+                                        <img t-att-src="kanban_image('fits.asset', 'image_1920', record.id.raw_value)" t-att-alt="record.asset_name.value" class="o_image_64_cover rounded" style="width: 80px; height: 80px; object-fit: cover;"/>
+                                    </div>
+                                </div>
+                                <div class="col-7 pl-2">
+                                    <div class="o_kanban_details">
+                                        <div class="o_kanban_record_title mb-1">
+                                            <strong style="font-size: 14px;"><field name="asset_name"/></strong>
+                                        </div>
+                                        <div class="o_kanban_record_subtitle text-muted mb-2" style="font-size: 12px;">
+                                            <field name="serial_number_code"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Status and Condition Badges -->
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <div class="o_kanban_tags">
+                                        <span class="badge badge-pill mr-2 mb-1" t-attf-class="badge-#{record.status.raw_value == 'active' ? 'success' : record.status.raw_value == 'maintenance' ? 'warning' : record.status.raw_value == 'draft' ? 'secondary' : 'danger'}" style="font-size: 11px;">
+                                            <field name="status"/>
+                                        </span>
+                                        <span class="badge badge-info badge-pill mr-2 mb-1" style="font-size: 11px;">
+                                            <field name="condition"/>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Asset Details in Organized Sections -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-2" style="line-height: 1.4;">
+                                        <div class="small text-muted mb-1">
+                                            <i class="fa fa-building-o mr-2" style="width: 16px;"></i>
+                                            <span style="font-size: 11px;"><field name="main_asset_selection"/></span>
+                                        </div>
+                                        <div class="small text-muted mb-1">
+                                            <i class="fa fa-tag mr-2" style="width: 16px;"></i>
+                                            <span style="font-size: 11px;"><field name="category_id"/></span>
+                                        </div>
+                                        <div class="small text-muted mb-1">
+                                            <i class="fa fa-map-marker mr-2" style="width: 16px;"></i>
+                                            <span style="font-size: 11px;"><field name="location_asset_selection"/></span>
+                                        </div>
+                                        <div class="small text-muted">
+                                            <i class="fa fa-user mr-2" style="width: 16px;"></i>
+                                            <span style="font-size: 11px;"><field name="responsible_person_id"/></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    <record id="action_asset" model="ir.actions.act_window">
+        <field name="name">Asset</field>
+        <field name="res_model">fits.asset</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="groups_id" eval="[(4, ref('fits_assets_maintenance.group_fits_asset_maintenance_manager'))]"/>
+        <field name="context">{'search_default_recurrence_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create and manage your fixed assets here.
+            </p>
+        </field>
+    </record>
+
+    <!-- Asset QR Label Report Action -->
+    <record id="action_report_asset_qr_label" model="ir.actions.report">
+        <field name="name">Asset QR Label</field>
+        <field name="model">fits.asset</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">fits_assets_maintenance.report_asset_qr_label</field>
+        <field name="report_file">fits_assets_maintenance.report_asset_qr_label</field>
+        <field name="binding_model_id" ref="model_fits_asset"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Asset QR Code Popup View -->
+    <record id="view_asset_qr_code_popup" model="ir.ui.view">
+        <field name="name">fits.asset.qr.code.popup</field>
+        <field name="model">fits.asset</field>
+        <field name="arch" type="xml">
+            <form string="Asset QR Code">
+                <sheet>
+                    <!-- Header section with image, asset name, and main asset in center -->
+                    <div style="text-align: center; padding: 20px; max-width: 600px; margin: 0 auto;">
+                        <!-- Header -->
+                        <div style="border-bottom: 2px solid #007bff; padding-bottom: 15px; margin-bottom: 25px;">
+                            <h2 style="margin: 0; color: #007bff; font-size: 28px;">🏷️ Asset Identification</h2>
+                            <p style="margin: 5px 0 0 0; color: #6c757d; font-size: 14px;">QR Code Scan Result</p>
+                        </div>
+
+                        <!-- QR Code Image -->
+                        <div style="margin: 25px 0; background-color: #f8f9fa; padding: 20px; border-radius: 15px; border: 2px solid #e9ecef;">
+                            <h3 style="margin-top: 0; color: #495057;">QR Code</h3>
+                            <field name="qr_code_image" widget="image" readonly="1" nolabel="1"
+                                   style="width: 200px; height: 200px; border: 3px solid #007bff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,123,255,0.2);"/>
+                        </div>
+
+                        <!-- Asset Information Card -->
+                        <div style="background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); padding: 25px; border-radius: 15px; margin: 25px 0; border: 1px solid #dee2e6; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                            <h3 style="margin-top: 0; color: #495057; text-align: left;">📋 Asset Information</h3>
+
+                            <table style="width: 100%; border-collapse: collapse; background-color: white; border-radius: 8px; overflow: hidden;">
+                                <tr style="background-color: #007bff;">
+                                    <td style="padding: 12px 15px; font-weight: bold; color: white; width: 140px; text-align: left;">Main Asset:</td>
+                                    <td style="padding: 12px 15px; font-size: 16px;"><field name="main_asset_selection" readonly="1" style="font-weight: 500;"/></td>
+                                </tr>
+                                <tr style="background-color: #f8f9fa;">
+                                    <td style="padding: 12px 15px; font-weight: bold; color: #495057;">Category:</td>
+                                    <td style="padding: 12px 15px; font-size: 16px;"><field name="category_id" readonly="1" style="font-weight: 500;"/></td>
+                                </tr>
+                                <tr style="background-color: #ffffff;">
+                                    <td style="padding: 12px 15px; font-weight: bold; color: #495057;">Location Assets:</td>
+                                    <td style="padding: 12px 15px; font-size: 16px;"><field name="location_asset_selection" readonly="1" style="font-weight: 500;"/></td>
+                                </tr>
+                                <tr style="background-color: #f8f9fa;">
+                                    <td style="padding: 12px 15px; font-weight: bold; color: #495057;">Kode Asset:</td>
+                                    <td style="padding: 12px 15px; font-size: 18px; font-weight: bold; color: #007bff;"><field name="serial_number_code" readonly="1"/></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- Scan Timestamp -->
+                        <div style="background-color: #e9ecef; padding: 15px; border-radius: 8px; margin: 20px 0; font-size: 12px; color: #6c757d;">
+                            <p style="margin: 0;">🔍 QR Code accessed for asset identification and tracking</p>
+                            <p style="margin: 5px 0 0 0;">This QR code contains asset identification information for inventory and tracking purposes.</p>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div style="margin-top: 30px; display: flex; gap: 15px; justify-content: center;">
+                            <button name="print_qr_label_pdf" type="object" string="🖨️ Print PDF" class="btn-success" style="padding: 10px 20px; font-size: 14px;"/>
+                            <button special="cancel" string="❌ Close" class="btn-secondary" style="padding: 10px 20px; font-size: 14px;"/>
+                        </div>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

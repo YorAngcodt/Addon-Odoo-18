@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_asset_detail">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <h2 style="text-align:center; margin-bottom:20px;">Asset Report</h2>
+                    <table class="table table-sm" style="width:100%; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th style="border:1px solid #ddd; padding:6px; text-align:center;">No</th>
+                                <th style="border:1px solid #ddd; padding:6px;">Name Asset</th>
+                                <th style="border:1px solid #ddd; padding:6px;">Status</th>
+                                <th style="border:1px solid #ddd; padding:6px;">Asset Category</th>
+                                <th style="border:1px solid #ddd; padding:6px;">Location Asset</th>
+                                <th style="border:1px solid #ddd; padding:6px;">Code Asset</th>
+                                <th style="border:1px solid #ddd; padding:6px;">Tanggal Acquisition</th>
+                                <th style="border:1px solid #ddd; padding:6px;">Responsible Person</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-set="i" t-value="0"/>
+                            <t t-foreach="docs" t-as="asset">
+                                <t t-set="i" t-value="i + 1"/>
+                                <tr>
+                                    <td style="border:1px solid #ddd; padding:6px; text-align:center;" t-esc="i"/>
+                                    <td style="border:1px solid #ddd; padding:6px;" t-esc="asset.asset_name or ''"/>
+                                    <td style="border:1px solid #ddd; padding:6px;" t-esc="asset.status or ''"/>
+                                    <td style="border:1px solid #ddd; padding:6px;" t-esc="asset.category_id.name or ''"/>
+                                    <td style="border:1px solid #ddd; padding:6px;" t-esc="asset.location_asset_selection.location_name or ''"/>
+                                    <td style="border:1px solid #ddd; padding:6px;" t-esc="asset.serial_number_code or ''"/>
+                                    <td style="border:1px solid #ddd; padding:6px;" t-esc="asset.acquisition_date or ''"/>
+                                    <td style="border:1px solid #ddd; padding:6px;" t-esc="asset.responsible_person_id.name or ''"/>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_asset_detail" model="ir.actions.report">
+        <field name="name">Asset Detail Report</field>
+        <field name="model">fits.asset</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">fits_assets_maintenance.report_asset_detail</field>
+        <field name="report_file">fits_assets_maintenance.report_asset_detail</field>
+    </record>
+</odoo>

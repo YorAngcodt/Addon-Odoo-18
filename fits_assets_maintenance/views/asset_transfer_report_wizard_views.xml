@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Asset Transfer Report Wizard Form View -->
+    <record id="view_asset_transfer_report_wizard_form" model="ir.ui.view">
+        <field name="name">fits.asset.transfer.report.wizard.form</field>
+        <field name="model">fits.asset.transfer.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Asset Transfers Report">
+                <sheet>
+                    <div style="max-width: 700px; margin: 0 auto; padding: 20px;">
+                        <div style="text-align: center; margin-bottom: 30px; padding: 20px; background: linear-gradient(135deg, #17a2b8 0%, #117a8b 100%); border-radius: 15px; color: white;">
+                            <h2 style="margin: 0; font-size: 24px;">🔁 Asset Transfers Report</h2>
+                            <p style="margin: 8px 0 0 0; opacity: 0.9;">Generate transfer list PDF</p>
+                        </div>
+                        <group>
+                                <field name="selection_mode"
+                                    placeholder="Pilih Selection Mode..."
+                                    required="1"/>
+                        </group>
+
+                        <group string="Filters" invisible="selection_mode not in ['manual', 'category', 'all']">
+                            <field name="transfer_ids_manual" widget="many2many_tags" options="{'no_create': True, 'no_open': True}" invisible="selection_mode != 'manual'"/>
+                            <field name="category_ids" widget="many2many_tags" options="{'no_create': True, 'no_open': True}" invisible="selection_mode != 'category'"/>
+                            <field name="date_start" invisible="selection_mode == 'manual'"/>
+                            <field name="date_end" invisible="selection_mode == 'manual'"/>
+                        </group>
+                        <footer style="margin-top: 30px; text-align: center;">
+                            <button name="action_print_asset_transfer_report" type="object" string="🖨️ Print PDF" class="btn-primary" style="padding: 12px 30px; font-size: 16px; margin-right: 15px;" invisible="selection_mode not in ['manual', 'category', 'all']"/>
+                            <button special="cancel" string="❌ Cancel" class="btn-secondary" style="padding: 12px 25px; font-size: 16px;"/>
+                        </footer>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_asset_transfer_report_wizard" model="ir.actions.act_window">
+        <field name="name">Asset Transfers Report</field>
+        <field name="res_model">fits.asset.transfer.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

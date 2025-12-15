@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="view_maintenance_request_cancel_wizard" model="ir.ui.view">
+            <field name="name">fits.maintenance.request.cancel.wizard</field>
+            <field name="model">fits.maintenance.request.cancel</field>
+            <field name="arch" type="xml">
+                <form string="Cancel Maintenance Request">
+                    <div class="oe_title">
+                        <h2>Cancel Maintenance Request</h2>
+                    </div>
+                    <div class="oe_edit_only">
+                        <div class="alert alert-warning" role="alert">
+                            <i class="fa fa-warning me-2"/> Are you sure you want to cancel this maintenance request?
+                        </div>
+                        <div class="mt16">
+                            <label for="reason" class="form-label">Reason for Cancellation</label>
+                            <field name="reason" placeholder="Please provide a reason for cancellation..." class="form-control" nolabel="1" required="1"/>
+                        </div>
+                        <footer class="mt16">
+                            <button name="action_cancel" string="Back" class="btn-secondary" type="object"/>
+                            <button name="action_confirm_cancel" string="Confirm Cancellation" class="btn-danger float-end" type="object"/>
+                        </footer>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_maintenance_request_cancel_wizard" model="ir.actions.act_window">
+            <field name="name">Cancel Maintenance Request</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">fits.maintenance.request.cancel</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="context">{'default_maintenance_request_id': active_id}</field>
+            <field name="binding_model_id" ref="model_fits_maintenance_request"/>
+        </record>
+    </data>
+</odoo>

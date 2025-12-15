@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ========================= -->
+    <!-- FORM VIEW: Maintenance Team -->
+    <!-- ========================= -->
+    <record id="view_maintenance_team_form" model="ir.ui.view">
+        <field name="name">fits.maintenance.team.form</field>
+        <field name="model">fits.maintenance.team</field>
+        <field name="arch" type="xml">
+            <form string="Maintenance Team">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Enter team name..."/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="name" required="1"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+
+                    <separator string="Team Members"/>
+                    <field name="member_ids" widget="many2many_tags"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ========================= -->
+    <!-- LIST VIEW -->
+    <!-- ========================= -->
+    <record id="view_maintenance_team_list" model="ir.ui.view">
+        <field name="name">fits.maintenance.team.list</field>
+        <field name="model">fits.maintenance.team</field>
+        <field name="arch" type="xml">
+            <list string="Maintenance Teams" editable="bottom">
+                <field name="name"/>
+                <field name="member_ids" widget="many2many_tags"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ========================= -->
+    <!-- SEARCH VIEW -->
+    <!-- ========================= -->
+    <record id="view_maintenance_team_search" model="ir.ui.view">
+        <field name="name">fits.maintenance.team.search</field>
+        <field name="model">fits.maintenance.team</field>
+        <field name="arch" type="xml">
+            <search string="Maintenance Teams">
+                <field name="name"/>
+                <field name="member_ids"/>
+
+                <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Inactive" name="inactive" domain="[('active', '=', False)]"/>
+
+                <group expand="0" string="Group By">
+                    <filter string="Active" name="active_group" context="{'group_by':'active'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ========================= -->
+    <!-- ACTION -->
+    <!-- ========================= -->
+    <record id="action_maintenance_team" model="ir.actions.act_window">
+        <field name="name">Maintenance Teams</field>
+        <field name="res_model">fits.maintenance.team</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'active_test': False, 'default_active': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first maintenance team!
+            </p>
+        </field>
+    </record>
+
+</odoo>

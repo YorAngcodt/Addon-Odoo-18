@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_maintenance_detail">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <h2 style="text-align:center; margin-bottom:20px;">Maintenance Report</h2>
+
+                    <table class="table table-sm" style="width:100%; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th style="border:1px solid #ddd; padding:6px; text-align:center;">No</th>
+                                <th style="border:1px solid #ddd; padding:6px;">Name Asset</th>
+                                <th style="border:1px solid #ddd; padding:6px;">Category</th>
+                                <th style="border:1px solid #ddd; padding:6px;">Location</th>
+                                <th style="border:1px solid #ddd; padding:6px;">Code Asset</th>
+                                <th style="border:1px solid #ddd; padding:6px;">Services Responsible</th>
+                                <th style="border:1px solid #ddd; padding:6px;">Maintenance Type</th>
+                                <th style="border:1px solid #ddd; padding:6px;">Scheduled Start</th>
+                                <th style="border:1px solid #ddd; padding:6px;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-set="i" t-value="0"/>
+                            <t t-foreach="docs" t-as="req">
+                                <t t-set="i" t-value="i + 1"/>
+                                <tr>
+                                    <td style="border:1px solid #ddd; padding:6px; text-align:center;" t-esc="i"/>
+                                    <td style="border:1px solid #ddd; padding:6px;" t-esc="req.asset_id.display_name or ''"/>
+                                    <td style="border:1px solid #ddd; padding:6px;" t-esc="req.category_id.display_name or ''"/>
+                                    <td style="border:1px solid #ddd; padding:6px;" t-esc="req.location_asset_id.display_name or ''"/>
+                                    <td style="border:1px solid #ddd; padding:6px;" t-esc="req.asset_code or ''"/>
+                                    <td style="border:1px solid #ddd; padding:6px;" t-esc="req.user_id.display_name or ''"/>
+                                    <td style="border:1px solid #ddd; padding:6px;" t-esc="req.maintenance_type or ''"/>
+                                    <td style="border:1px solid #ddd; padding:6px;" t-esc="req.scheduled_date or ''"/>
+                                    <td style="border:1px solid #ddd; padding:6px;" t-esc="req.state or ''"/>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_maintenance_detail" model="ir.actions.report">
+        <field name="name">Maintenance Detail Report</field>
+        <field name="model">fits.maintenance.request</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">fits_assets_maintenance.report_maintenance_detail</field>
+        <field name="report_file">fits_assets_maintenance.report_maintenance_detail</field>
+    </record>
+</odoo>

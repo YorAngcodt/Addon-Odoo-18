@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_fits_assets_root"
+              name="Assets &amp; Maintenance"
+              groups="fits_assets_maintenance.group_fits_asset_maintenance_user,fits_assets_maintenance.group_fits_asset_maintenance_manager,fits_assets_maintenance.group_fits_maintenance_team"/>
+
+    <menuitem id="menu_fits_assets"
+              name="Assets"
+              parent="menu_fits_assets_root"
+              sequence="10"
+              groups="fits_assets_maintenance.group_fits_asset_maintenance_user,fits_assets_maintenance.group_fits_asset_maintenance_manager,fits_assets_maintenance.group_fits_maintenance_team"/>
+
+    <menuitem id="menu_fits_assets_items"
+              name="Asset"
+              parent="menu_fits_assets"
+              action="action_asset"
+              groups="fits_assets_maintenance.group_fits_asset_maintenance_user,fits_assets_maintenance.group_fits_asset_maintenance_manager,fits_assets_maintenance.group_fits_maintenance_team"/>
+
+    <!-- Asset Transfer Menu -->
+    <menuitem id="menu_fits_asset_transfer"
+              name="Asset Transfer"
+              parent="menu_fits_assets"
+              action="action_asset_transfer"
+              sequence="20"
+              groups="fits_assets_maintenance.group_fits_asset_maintenance_user,fits_assets_maintenance.group_fits_asset_maintenance_manager,fits_assets_maintenance.group_fits_maintenance_team"/>
+
+    <!-- <menuitem id="menu_fits_asset_disposal" name="Asset Disposal" parent="menu_fits_assets" action="action_asset_disposal" sequence="30"/> -->
+
+    <!-- Maintenance Menu -->
+    <menuitem id="menu_fits_maintenance"
+              name="Maintenance"
+              parent="menu_fits_assets_root"
+              sequence="30"
+              groups="fits_assets_maintenance.group_fits_asset_maintenance_user,fits_assets_maintenance.group_fits_asset_maintenance_manager,fits_assets_maintenance.group_fits_maintenance_team"/>
+
+    <!-- Maintenance Requests -->
+    <menuitem id="menu_fits_maintenance_requests"
+              name="Maintenance Requests"
+              parent="menu_fits_maintenance"
+              action="action_maintenance_request"
+              sequence="10"
+              groups="fits_assets_maintenance.group_fits_asset_maintenance_user,fits_assets_maintenance.group_fits_asset_maintenance_manager,fits_assets_maintenance.group_fits_maintenance_team"/>
+
+    <!-- Maintenance Calendar -->
+    <menuitem id="menu_fits_maintenance_calendar"
+              name="Maintenance Calendar"
+              parent="menu_fits_maintenance"
+              action="action_maintenance_calendar"
+              sequence="15"
+              groups="fits_assets_maintenance.group_fits_asset_maintenance_user,fits_assets_maintenance.group_fits_asset_maintenance_manager,fits_assets_maintenance.group_fits_maintenance_team"/>
+
+    <!-- Reporting Menu -->
+    <menuitem id="menu_fits_assets_reporting"
+              name="Reporting"
+              parent="menu_fits_assets_root"
+              sequence="50"
+              groups="fits_assets_maintenance.group_fits_asset_maintenance_manager,fits_assets_maintenance.group_fits_maintenance_team"/>
+
+    <!-- QR Code Report Menu -->
+    <menuitem id="menu_fits_asset_qr_report"
+              name="Report Asset QR"
+              parent="menu_fits_assets_reporting"
+              action="action_asset_qr_report_wizard"
+              sequence="10"
+              groups="fits_assets_maintenance.group_fits_asset_maintenance_manager,fits_assets_maintenance.group_fits_maintenance_team"/>
+
+    <!-- Asset Report Menu (non-QR) -->
+    <menuitem id="menu_fits_asset_detail_report"
+              name="Report Asset"
+              parent="menu_fits_assets_reporting"
+              action="action_asset_report_wizard"
+              sequence="11"
+              groups="fits_assets_maintenance.group_fits_asset_maintenance_manager,fits_assets_maintenance.group_fits_maintenance_team"/>
+
+    <!-- Maintenance Report Menu -->
+    <menuitem id="menu_fits_maintenance_report"
+              name="Report Maintenance"
+              parent="menu_fits_assets_reporting"
+              action="action_maintenance_report_wizard"
+              sequence="20"
+              groups="fits_assets_maintenance.group_fits_asset_maintenance_manager,fits_assets_maintenance.group_fits_maintenance_team"/>
+
+    <!-- Asset Transfers Report Menu -->
+    <menuitem id="menu_fits_asset_transfer_report"
+              name="Report Asset Transfers"
+              parent="menu_fits_assets_reporting"
+              action="action_asset_transfer_report_wizard"
+              sequence="30"
+              groups="fits_assets_maintenance.group_fits_asset_maintenance_manager,fits_assets_maintenance.group_fits_maintenance_team"/>
+
+    <menuitem id="menu_fits_assets_config"
+              name="Configuration"
+              parent="menu_fits_assets_root"
+              sequence="90"
+              groups="fits_assets_maintenance.group_fits_asset_maintenance_manager"/>
+
+    <menuitem id="menu_fits_main_assets"
+              name="Main Assets"
+              parent="menu_fits_assets_config"
+              action="action_main_assets"
+              sequence="5"
+              groups="fits_assets_maintenance.group_fits_asset_maintenance_manager"/>
+
+    <menuitem id="menu_fits_asset_category"
+              name="Asset Category"
+              parent="menu_fits_assets_config"
+              action="action_asset_category"
+              sequence="10"
+              groups="fits_assets_maintenance.group_fits_asset_maintenance_manager"/>
+
+    <menuitem id="menu_fits_location_assets"
+              name="Location Assets"
+              parent="menu_fits_assets_config"
+              action="action_location_assets"
+              sequence="15"
+              groups="fits_assets_maintenance.group_fits_asset_maintenance_manager"/>
+
+    <menuitem id="menu_fits_maintenance_team"
+              name="Maintenance Teams"
+              parent="menu_fits_assets_config"
+              action="action_maintenance_team"
+              sequence="20"
+              groups="fits_assets_maintenance.group_fits_asset_maintenance_manager"/>
+</odoo>

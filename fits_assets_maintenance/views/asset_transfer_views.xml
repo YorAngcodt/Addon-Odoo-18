@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Asset Transfer Form View -->
+    <record id="view_asset_transfer_form" model="ir.ui.view">
+        <field name="name">fits.asset.transfer.form</field>
+        <field name="model">fits.asset.transfer</field>
+        <field name="arch" type="xml">
+            <form string="Asset Transfer">
+                <header>
+                    <button name="action_submit" string="Submit" type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_confirm" string="Approved" type="object" class="btn-success"
+                            invisible="state != 'submitted'"
+                            groups="fits_assets_maintenance.group_fits_asset_maintenance_manager"/>
+                    <button name="action_reset_to_draft" string="Set to Draft" type="object"
+                            class="btn-secondary"
+                            invisible="state not in ['submitted', 'approved']"
+                            groups="fits_assets_maintenance.group_fits_asset_maintenance_manager"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved"/>
+                </header>
+
+                <sheet>
+                    <!-- Judul "New" -->
+                    <div style="font-size:22px; font-weight:bold; color:#333; margin-bottom:12px;">
+                        <field name="name" readonly="1" nolabel="1"/>
+                    </div>
+
+                    <!-- Baris pertama: Transfer Details kiri, Asset Details kanan -->
+                    <group>
+                        <group string="Transfer Details">
+                            <field name="transfer_date" readonly="state not in ['draft']"/>
+                            <field name="asset_id" readonly="state not in ['draft']"/>
+                            <field name="reason" readonly="state not in ['draft']"/>
+                        </group>
+
+                        <group string="Asset Details">
+                            <field name="main_asset_name"/>
+                            <field name="asset_category_name"/>
+                            <field name="location_assets_name"/>
+                            <field name="asset_code"/>
+                        </group>
+                    </group>
+
+                    <!-- Baris kedua: Location Information kiri, Responsible Person kanan -->
+                    <group>
+                        <group string="Location Information">
+                            <field name="from_location"/>
+                            <field name="to_location" readonly="state not in ['draft']"/>
+                        </group>
+
+                        <group string="Responsible Person">
+                            <field name="current_responsible_person" string="Responsible Person"/>
+                            <field name="to_responsible_person" readonly="state not in ['draft']"/>
+                        </group>
+                    </group>
+                </sheet>
+
+                <!-- Chatter untuk komunikasi dan tracking -->
+                <chatter>
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                    <field name="activity_ids"/>
+                </chatter>
+            </form>
+        </field>
+    </record>
+
+    <!-- Asset Transfer List View -->
+    <record id="view_asset_transfer_list" model="ir.ui.view">
+        <field name="name">fits.asset.transfer.list</field>
+        <field name="model">fits.asset.transfer</field>
+        <field name="arch" type="xml">
+            <list string="Asset Transfers">
+                <field name="name"/>
+                <field name="asset_id"/>
+                <field name="transfer_date"/>
+                <field name="from_location"/>
+                <field name="to_location"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Asset Transfer Action -->
+    <record id="action_asset_transfer" model="ir.actions.act_window">
+        <field name="name">Asset Transfers</field>
+        <field name="res_model">fits.asset.transfer</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

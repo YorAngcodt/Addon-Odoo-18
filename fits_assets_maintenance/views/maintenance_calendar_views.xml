@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Calendar View for Maintenance Calendar -->
+    <record id="view_maintenance_calendar_calendar" model="ir.ui.view">
+        <field name="name">fits.maintenance.calendar.calendar</field>
+        <field name="model">fits.maintenance.calendar</field>
+        <field name="arch" type="xml">
+            <!-- Tombol New tetap ADA di sini -->
+            <calendar string="Maintenance Calendar" date_start="maintenance_date" color="asset_id">
+                <field name="name"/>
+                <field name="asset_id"/>
+                <field name="maintenance_date"/>
+                <field name="description"/>
+                <field name="hasil_status"/>
+                <field name="team_id"/>
+                <field name="team_members_ids"/>
+                <field name="maintenance_responsible_id"/>
+                <field name="recurrence_pattern"/>
+            </calendar>
+        </field>
+    </record>
+
+    <!-- Form View for Maintenance Calendar -->
+    <record id="view_maintenance_calendar_form" model="ir.ui.view">
+        <field name="name">fits.maintenance.calendar.form</field>
+        <field name="model">fits.maintenance.calendar</field>
+        <field name="arch" type="xml">
+            <form string="Maintenance Calendar Event">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" class="oe_inline"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Basic Information">
+                            <field name="asset_id" readonly="1"/>
+                            <field name="maintenance_date" readonly="1"/>
+                            <field name="main_asset_id" readonly="1"/>
+                            <field name="asset_category_id" readonly="1"/>
+                            <field name="location_asset_id" readonly="1"/>
+                            <field name="asset_code" readonly="1"/>
+                            <field name="asset_condition" readonly="1"/>
+                        </group>
+                        <group string="Maintenance Details">
+                            <field name="hasil_status" string="Status" readonly="1"/>
+                            <field name="team_id" readonly="1"/>
+                            <field name="team_members_ids" readonly="1" widget="many2many_tags"/>
+                            <field name="maintenance_responsible_id" readonly="1"/>
+                            <field name="maintenance_email" readonly="1"/>
+                        </group>
+                        <group string="Recurrence Information">
+                            <field name="recurrence_pattern"/>
+                            <field name="recurrence_start_date" readonly="1"/>
+                            <field name="recurrence_interval" readonly="1"/>
+                            <field name="recurrence_end_date" readonly="1"/>
+                            <field name="responsible_person_id"/>
+                        </group>
+                    </group>
+
+                    <!-- Notebook hanya untuk Description -->
+                    <notebook>
+                        <page string="Description">
+                            <field name="description" placeholder="Tambahkan catatan maintenance di sini..." nolabel="1" colspan="4"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View for Maintenance Calendar -->
+    <record id="view_maintenance_calendar_search" model="ir.ui.view">
+        <field name="name">fits.maintenance.calendar.search</field>
+        <field name="model">fits.maintenance.calendar</field>
+        <field name="arch" type="xml">
+            <search string="Maintenance Calendar">
+                <field name="name"/>
+                <field name="asset_id"/>
+                <field name="hasil_status"/>
+                <field name="team_id"/>
+                <field name="maintenance_responsible_id"/>
+                <field name="maintenance_date"/>
+
+                <filter string="In Progress" name="in_progress" domain="[('hasil_status', '=', 'in_progress')]"/>
+                <filter string="Draft" name="draft" domain="[('hasil_status', '=', 'draft')]"/>
+                <filter string="Repaired" name="repaired" domain="[('hasil_status', '=', 'repaired')]"/>
+                <filter string="Done" name="done" domain="[('hasil_status', '=', 'done')]"/>
+                <filter string="Cancelled" name="cancelled" domain="[('hasil_status', '=', 'cancelled')]"/>
+
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="status" context="{'group_by':'hasil_status'}"/>
+                    <filter string="Asset" name="asset_id" context="{'group_by':'asset_id'}"/>
+                    <filter string="Team" name="team_id" context="{'group_by':'team_id'}"/>
+                    <filter string="Responsible" name="maintenance_responsible_id" context="{'group_by':'maintenance_responsible_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- List View for Maintenance Calendar -->
+    <record id="view_maintenance_calendar_list" model="ir.ui.view">
+        <field name="name">fits.maintenance.calendar.list</field>
+        <field name="model">fits.maintenance.calendar</field>
+        <field name="arch" type="xml">
+            <!-- Tombol New dihapus hanya di sini -->
+            <list string="Maintenance Calendar" create="false">
+                <field name="asset_id"/>
+                <field name="maintenance_date"/>
+                <field name="hasil_status"/>
+                <field name="maintenance_responsible_id"/>
+                <field name="team_id"/>
+                <field name="recurrence_start_date"/>
+                <field name="recurrence_end_date"/>
+                <field name="responsible_person_id"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Action for Maintenance Calendar -->
+    <record id="action_maintenance_calendar" model="ir.actions.act_window">
+        <field name="name">Maintenance Calendar</field>
+        <field name="res_model">fits.maintenance.calendar</field>
+        <field name="view_mode">calendar,list</field>
+        <field name="view_id" ref="view_maintenance_calendar_list"/>
+        <field name="search_view_id" ref="view_maintenance_calendar_search"/>
+        <field name="context">{'create_calendar_events': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                View maintenance schedule in calendar or list format. Switch between visual calendar and detailed list view.
+            </p>
+        </field>
+    </record>
+
+</odoo>

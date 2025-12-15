@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ========================================================= -->
+    <!-- FORM VIEW: Asset Disposal -->
+    <!-- ========================================================= -->
+    <record id="view_asset_disposal_form" model="ir.ui.view">
+        <field name="name">fits.asset.disposal.form</field>
+        <field name="model">fits.asset.disposal</field>
+        <field name="arch" type="xml">
+            <form string="Asset Disposal">
+                <!-- ================= HEADER ================= -->
+                <header>
+                    <button name="action_submit"
+                            string="Submit"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state != 'draft'"/>
+
+                    <button name="action_approve"
+                            string="Approve"
+                            type="object"
+                            class="btn-success"
+                            invisible="state != 'submit'"/>
+
+                    <button name="action_set_to_draft"
+                            string="Set to Draft"
+                            type="object"
+                            class="btn-secondary"
+                            invisible="state not in ['submit', 'approved']"/>
+
+                    <field name="state"
+                           widget="statusbar"
+                           statusbar_visible="draft,submit,approved"/>
+                </header>
+
+                <!-- ================= BODY ================= -->
+                <sheet>
+                     <!-- Judul "New" -->
+                    <div style="font-size:22px; font-weight:bold; color:#333; margin-bottom:12px;">
+                        <field name="name" readonly="1" nolabel="1"/>
+                    </div>
+
+                    <!-- Disposal Information & Asset Details Side by Side -->
+                    <group>
+                        <!-- Left Column: Disposal Information -->
+                        <group string="Disposal Information">
+                            <field name="disposal_date"/>
+                            <field name="asset_id"/>
+                        </group>
+
+                        <!-- Right Column: Asset Details (Combined) -->
+                        <group string="Asset Details">
+                            <field name="main_asset"/>
+                            <field name="asset_category"/>
+                            <field name="serial_number"/>
+                            <field name="location"/>
+                        </group>
+                    </group>
+
+                    <!-- Disposal Method & Value + Additional Information Side by Side -->
+                    <group>
+                        <!-- Left Column -->
+                        <group string="Disposal Method &amp; Value">
+                            <group>
+                                <field name="disposal_method"/>
+                            </group>
+                            <group>
+                                <field name="disposal_value"/>
+                            </group>
+                        </group>
+
+                        <!-- Right Column -->
+                        <group string="Additional Information">
+                            <field name="reason"/>
+                        </group>
+                    </group>
+                </sheet>
+
+                <!-- ================= CHATTER ================= -->
+                <chatter>
+                    <field name="message_follower_ids"/>
+                    <field name="message_ids"/>
+                    <field name="activity_ids"/>
+                </chatter>
+            </form>
+        </field>
+    </record>
+
+    <!-- ========================================================= -->
+    <!-- LIST VIEW: Asset Disposal -->
+    <!-- ========================================================= -->
+    <record id="view_asset_disposal_list" model="ir.ui.view">
+        <field name="name">fits.asset.disposal.list</field>
+        <field name="model">fits.asset.disposal</field>
+        <field name="arch" type="xml">
+            <list string="Asset Disposals">
+                <field name="name"/>
+                <field name="asset_id"/>
+                <field name="disposal_date"/>
+                <field name="disposal_method"/>
+                <field name="disposal_value"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ========================================================= -->
+    <!-- ACTION: Asset Disposal -->
+    <!-- ========================================================= -->
+    <record id="action_asset_disposal" model="ir.actions.act_window">
+        <field name="name">Asset Disposals</field>
+        <field name="res_model">fits.asset.disposal</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

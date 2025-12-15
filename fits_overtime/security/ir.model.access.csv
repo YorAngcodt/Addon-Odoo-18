@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_overtime_configuration,access.overtime.configuration.user,model_overtime_configuration,base.group_user,1,1,1,1
+access_overtime_configuration_line,access.overtime.configuration.line.user,model_overtime_configuration_line,base.group_user,1,1,1,1
+access_overtime_request,access.overtime.request.user,model_overtime_request,base.group_user,1,1,1,1
+overtime_request_user,Overtime Request User,model_overtime_request,base.group_user,1,1,1,0
+overtime_request_manager,Overtime Request Manager,model_overtime_request,fits_overtime.group_overtime_manager,1,1,1,1
+access_overtime_reporting_manager,access.overtime.reporting.manager,model_overtime_reporting,fits_overtime.group_overtime_manager,1,0,0,0
+access_overtime_reporting_user,access.overtime.reporting.user,model_overtime_reporting,fits_overtime.group_overtime_user,1,0,0,0
+access_overtime_reporting_wizard_manager,access.overtime.reporting.wizard.manager,model_overtime_reporting_wizard,fits_overtime.group_overtime_manager,1,1,1,1
+access_overtime_reporting_wizard_user,access.overtime.reporting.wizard.user,model_overtime_reporting_wizard,fits_overtime.group_overtime_user,1,1,1,1

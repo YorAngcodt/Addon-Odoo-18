@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ================= Main Menu ================= -->
+    <menuitem id="menu_overtime_main"
+              name="Overtime Management"
+              sequence="10"
+              groups="fits_overtime.group_overtime_user,fits_overtime.group_overtime_manager"/>
+
+    <!-- ================= Request Menu ================= -->
+    <menuitem id="menu_overtime_request"
+              name="OT Requests"
+              parent="menu_overtime_main"
+              action="action_overtime_request"
+              sequence="10"
+              groups="fits_overtime.group_overtime_user,fits_overtime.group_overtime_manager"/>
+
+    <!-- ================= Reporting Menu ================= -->
+    <menuitem id="menu_overtime_reporting"
+              name="Reporting"
+              parent="menu_overtime_main"
+              action="action_overtime_reporting_wizard"
+              sequence="15"
+              groups="fits_overtime.group_overtime_manager"/>
+
+    <!-- ================= Configuration Menu ================= -->
+    <menuitem id="menu_overtime_configuration"
+              name="Configuration"
+              parent="menu_overtime_main"
+              action="action_overtime_configuration"
+              sequence="20"
+              groups="fits_overtime.group_overtime_manager"/>
+</odoo>

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+   <!-- Overtime Request List View -->
+   <record id="view_overtime_request_list" model="ir.ui.view">
+    <field name="name">overtime.request.list</field>
+    <field name="model">overtime.request</field>
+    <field name="arch" type="xml">
+        <list string="Overtime Request"
+              decoration-success="status == 'approved'"
+              decoration-danger="status == 'rejected'">
+            <field name="employee_id"/>
+            <field name="start_datetime" widget="datetime" options="{'format': 'dd/MM/yyyy HH:mm'}"/>
+            <field name="end_datetime" widget="datetime" options="{'format': 'dd/MM/yyyy HH:mm'}"/>
+            <!-- Request Day Type -->
+            <field name="request_day_type"
+                   widget="badge"
+                   decoration-info="request_day_type == 'weekday'"
+                   decoration-warning="request_day_type == 'off'"/>
+            <!-- Status -->
+            <field name="status"
+                   widget="badge"
+                   decoration-info="status == 'draft'"
+                   decoration-warning="status == 'submitted'"
+                   decoration-success="status == 'approved'"
+                   decoration-danger="status == 'rejected'"/>
+        </list>
+    </field>
+</record>
+
+    <!-- Overtime Request Form View -->
+    <record id="view_overtime_request_form" model="ir.ui.view">
+        <field name="name">overtime.request.form</field>
+        <field name="model">overtime.request</field>
+        <field name="arch" type="xml">
+            <form string="Overtime Request">
+                <header>
+                    <button name="action_submit" string="Submit" type="object"
+                            class="btn-primary"
+                            groups="fits_overtime.group_overtime_user"
+                            invisible="status != 'draft'"/>
+                    <button name="action_set_draft" string="Set to Draft" type="object"
+                            class="btn-secondary"
+                            groups="fits_overtime.group_overtime_manager"
+                            invisible="not (status == 'approved' or status == 'rejected')"/>
+                    <button name="action_approve" string="Approve" type="object"
+                            class="btn-success"
+                            groups="fits_overtime.group_overtime_manager"
+                            invisible="status != 'submitted'"/>
+                    <button name="action_reject" string="Reject" type="object"
+                            class="btn-danger"
+                            groups="fits_overtime.group_overtime_manager"
+                            invisible="status != 'submitted'"/>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="draft,submitted,approved,rejected"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+
+                    <!-- Employee Information & Request Status -->
+                    <group col="2" string="Overtime Details">
+                        <!-- Employee Information -->
+                       <group string="Employee Information">
+                            <field name="employee_id" readonly="status != 'draft'"/>
+                            <field name="department_id" readonly="1"/>
+                            <field name="manager_id" readonly="1"/>
+                            <field name="overtime_configuration_id" readonly="1"/>
+                        </group>
+
+                        <!-- Request Status -->
+                        <group string="Request Status">
+                            <field name="status" readonly="1" widget="badge"
+                                   decoration-info="status == 'draft'"
+                                   decoration-warning="status == 'submitted'"
+                                   decoration-success="status == 'approved'"
+                                   decoration-danger="status == 'rejected'"/>
+                            <field name="configuration_status" readonly="1" widget="badge"
+                                   decoration-success="configuration_status == 'active'"
+                                   decoration-info="configuration_status == 'draft'"
+/>
+                            <field name="configuration_period" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <!-- Time Information & Overtime Breakdown -->
+                    <group col="2" string="Time &amp; Breakdown">
+                        <group string="Time Information">
+                            <field name="start_datetime" readonly="status != 'draft'" widget="datetime" options="{'format': 'dd/MM/yyyy HH:mm'}"/>
+                            <field name="end_datetime" readonly="status != 'draft'" widget="datetime" options="{'format': 'dd/MM/yyyy HH:mm'}"/>
+                            <field name="total_hours" readonly="1"/>
+                            <field name="request_day_type" readonly="1" widget="badge"
+                                   decoration-info="request_day_type == 'weekday'"
+                                   decoration-warning="request_day_type == 'off'"/>
+                            <field name="include_in_payroll" readonly="status != 'draft'"/>
+                        </group>
+                        <group string="Overtime Breakdown">
+                            <group string="Working Days">
+                                <field name="ot1_hours_weekday" readonly="1"/>
+                                <field name="ot2_hours_weekday" readonly="1"/>
+                                <field name="ot3_hours_weekday" readonly="1"/>
+                                <field name="overtime_breakdown_weekday" readonly="1"/>
+                            </group>
+                            <group string="Days Off">
+                                <field name="ot1_hours_off" readonly="1"/>
+                                <field name="ot2_hours_off" readonly="1"/>
+                                <field name="ot3_hours_off" readonly="1"/>
+                                <field name="overtime_breakdown_off" readonly="1"/>
+                            </group>
+                            <field name="calculation_debug_info" readonly="1" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <!-- Description -->
+                    <group string="Overtime Description">
+                        <field 
+                            name="description" 
+                            nolabel="1" 
+                            placeholder="Enter reason for overtime request..." 
+                            readonly="status != 'draft'" 
+                            widget="text"
+                            options="{'rows': 6}" 
+                            style="height:150px;" required="1"/>
+                    </group>
+                </sheet>
+
+                <!-- Chatter -->
+                <chatter>
+                    <field name="message_ids"/>
+                    <field name="activity_ids"/>
+                </chatter>
+            </form>
+        </field>
+    </record>
+
+    <!-- Overtime Request Action -->
+    <record id="action_overtime_request" model="ir.actions.act_window">
+        <field name="name">Overtime Request</field>
+        <field name="res_model">overtime.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first overtime request!</p>
+            <p>Submit overtime requests and see automatic calculation based on configured overtime types.</p>
+        </field>
+    </record>
+
+    <!-- Overtime Request Search View -->
+    <record id="view_overtime_request_search" model="ir.ui.view">
+        <field name="name">overtime.request.search</field>
+        <field name="model">overtime.request</field>
+        <field name="arch" type="xml">
+            <search string="Search Overtime Requests">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="status"/>
+                <field name="request_day_type"/>
+
+                <filter name="filter_working_days" string="Working Days" domain="[('request_day_type','=','weekday')]"/>
+                <filter name="filter_working_days_off" string="Days Off" domain="[('request_day_type','=','off')]"/>
+
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter name="group_employee" string="Employee" context="{'group_by':'employee_id'}"/>
+                    <filter name="group_status" string="Status" context="{'group_by':'status'}"/>
+                    <filter name="group_daytype" string="Day Type" context="{'group_by':'request_day_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

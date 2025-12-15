@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Wizard Action -->
+    <record id="action_overtime_reporting_wizard" model="ir.actions.act_window">
+        <field name="name">Overtime Report Filter</field>
+        <field name="res_model">overtime.reporting.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Action for Reporting Menu -->
+    <record id="action_overtime_reporting" model="ir.actions.act_window">
+        <field name="name">Overtime Reporting</field>
+        <field name="res_model">overtime.reporting</field>
+        <field name="view_mode">list,pivot,graph</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No overtime reports found. Create overtime requests to generate reports.
+            </p>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_overtime_reporting_search" model="ir.ui.view">
+        <field name="name">overtime.reporting.search</field>
+        <field name="model">overtime.reporting</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="overtime_configuration_id"/>
+                <field name="start_datetime"/>
+                <field name="end_datetime"/>
+                <field name="request_status"/>
+                <field name="request_day_type"/>
+                <filter string="Approved" name="approved" domain="[('request_status', '=', 'approved')]"/>
+                <filter string="This Month" name="this_month" domain="[('start_datetime', '&gt;=', context_today().strftime('%Y-%m-01')), ('start_datetime', '&lt;', (context_today() + relativedelta(months=1)).strftime('%Y-%m-01'))]"/>
+                <filter string="Last Month" name="last_month" domain="[('start_datetime', '&gt;=', (context_today() + relativedelta(months=-1)).strftime('%Y-%m-01')), ('start_datetime', '&lt;', context_today().strftime('%Y-%m-01'))]"/>
+                <group expand="1" string="Group By">
+                    <filter string="Employee" name="group_employee" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Configuration" name="group_config" context="{'group_by': 'overtime_configuration_id'}"/>
+                    <filter string="Month" name="group_month" context="{'group_by': 'start_datetime:month'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'request_status'}"/>
+                    <filter string="Day Type" name="group_day_type" context="{'group_by': 'request_day_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_overtime_reporting_form" model="ir.ui.view">
+        <field name="name">overtime.reporting.form</field>
+        <field name="model">overtime.reporting</field>
+        <field name="arch" type="xml">
+            <form string="Overtime Report" create="false" edit="false" delete="false">
+                <header>
+                    <button name="%(action_overtime_reporting_wizard)s" string="Filter Report" type="action" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="overtime_configuration_id"/>
+                            <field name="request_status"/>
+                            <field name="request_day_type"/>
+                        </group>
+                        <group>
+                            <field name="start_datetime" widget="datetime" options="{'format': 'dd/MM/yyyy HH:mm'}"/>
+                            <field name="end_datetime" widget="datetime" options="{'format': 'dd/MM/yyyy HH:mm'}"/>
+                            <field name="total_hours"/>
+                            <field name="overtime_request_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- list View -->
+    <record id="view_overtime_reporting_list" model="ir.ui.view">
+        <field name="name">overtime.reporting.list</field>
+        <field name="model">overtime.reporting</field>
+        <field name="arch" type="xml">
+            <list create="false" edit="false" delete="false">
+                <header>
+                    <button name="%(action_overtime_reporting_wizard)s" string="Filter Report" type="action" class="btn-primary"/>
+                </header>
+                <field name="employee_id"/>
+                <field name="start_datetime" widget="datetime" options="{'format': 'dd/MM/yyyy HH:mm'}"/>
+                <field name="end_datetime" widget="datetime" options="{'format': 'dd/MM/yyyy HH:mm'}"/>
+                <field name="total_hours" sum="Total Hours"/>
+                <field name="request_status"/>
+                <field name="request_day_type"/>
+                <field name="overtime_configuration_id"/>
+            </list>
+        </field>
+    </record>
+
+
+    <!-- Pivot View -->
+    <record id="view_overtime_reporting_pivot" model="ir.ui.view">
+        <field name="name">overtime.reporting.pivot</field>
+        <field name="model">overtime.reporting</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="employee_id" type="row"/>
+                <field name="start_datetime" interval="month" type="col"/>
+                <field name="total_hours" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View -->
+    <record id="view_overtime_reporting_graph" model="ir.ui.view">
+        <field name="name">overtime.reporting.graph</field>
+        <field name="model">overtime.reporting</field>
+        <field name="arch" type="xml">
+            <graph type="bar">
+                <field name="employee_id" type="row"/>
+                <field name="total_hours" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- PDF Report Action -->
+    <record id="action_overtime_reporting_pdf" model="ir.actions.report">
+        <field name="name">Overtime Report</field>
+        <field name="model">overtime.reporting</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">fits_overtime.overtime_report_template</field>
+        <field name="print_report_name">'Overtime Report - %s' % (object.start_datetime.strftime('%Y-%m'))</field>
+    </record>
+
+    <!-- PDF Report Template - Updated with Numeric Month and Day Type Fix -->
+<template id="overtime_report_template">
+    <t t-call="web.html_container">
+        <t t-call="web.external_layout">
+            <div class="page">
+                <h2 style="text-align:center; margin-bottom: 20px;">Overtime Report</h2>
+                <p>Period: 
+                    <span t-esc="context.get('report_date_from')"/> - <span t-esc="context.get('report_date_to')"/>
+                </p>
+
+
+                <table class="table table-bordered" style="width:100%; border-collapse: collapse; margin-top: 10px;">
+                    <thead>
+                        <tr style="background-color:#f2f2f2; text-align:left;">
+                            <th style="padding:5px; border:1px solid #ddd; width:3%;">No</th>
+                            <th style="padding:5px; border:1px solid #ddd; width:12%;">Employee</th>
+                            <th style="padding:5px; border:1px solid #ddd; width:10%;">Configuration</th>
+                            <th style="padding:5px; border:1px solid #ddd; width:12%;">Start Date</th>
+                            <th style="padding:5px; border:1px solid #ddd; width:12%;">End Date</th>
+                            <th style="padding:5px; border:1px solid #ddd; width:7%;">Total Hours</th>
+                            <th style="padding:5px; border:1px solid #ddd; width:8%;">Status</th>
+                            <th style="padding:5px; border:1px solid #ddd; width:10%;">Day Type</th>
+                            <th style="padding:5px; border:1px solid #ddd; width:26%;">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="docs" t-as="record">
+                            <tr>
+                                <!-- No -->
+                                <td style="padding:5px; border:1px solid #ddd; text-align:center;">
+                                    <t t-esc="record_index + 1"/>
+                                </td>
+                                
+                                <!-- Employee -->
+                                <td style="padding:5px; border:1px solid #ddd;">
+                                    <t t-esc="record.employee_id.name or '-'"/>
+                                </td>
+                                
+                                <!-- Configuration -->
+                                <td style="padding:5px; border:1px solid #ddd;">
+                                    <t t-esc="record.overtime_configuration_id.name or '-'"/>
+                                </td>
+
+                                <!-- Start Date -->
+                                <td style="padding:5px; border:1px solid #ddd;">
+                                    <span t-field="record.start_datetime" t-options="{'widget': 'datetime', 'format': 'MM/dd/yyyy HH:mm:ss'}"/>
+                                </td>
+
+                                <!-- End Date -->
+                                <td style="padding:5px; border:1px solid #ddd;">
+                                    <span t-field="record.end_datetime" t-options="{'widget': 'datetime', 'format': 'MM/dd/yyyy HH:mm:ss'}"/>
+                                </td>
+
+                                <!-- Total Hours -->
+                                <td style="padding:5px; border:1px solid #ddd; text-align:right;">
+                                    <t t-esc="'%.2f' % (record.total_hours or 0.0)"/>
+                                </td>
+
+                                <!-- Status -->
+                                <td style="padding:5px; border:1px solid #ddd;">
+                                    <t t-esc="record.request_status or '-'"/>
+                                </td>
+
+                                <!-- Day Type -->
+                                <td style="padding:5px; border:1px solid #ddd;">
+                                    <t t-esc="('Working Days' if str(record.request_day_type).strip().lower()=='weekday' 
+                                                 else ('Days Off' if str(record.request_day_type).strip().lower()=='off' 
+                                                 else (record.request_day_type or '-')))"/>
+                                </td>
+                                
+                                <!-- Description -->
+                                <td style="padding:5px; border:1px solid #ddd;">
+                                    <t t-esc="record.description or '-'"/>
+                                </td>
+                            </tr>
+                        </t>
+
+                        <!-- Jika tidak ada data -->
+                        <t t-if="not docs">
+                            <tr>
+                                <td colspan="9" style="padding:10px; text-align:center; border:1px solid #ddd;">
+                                    No records found
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+
+                <p style="margin-top:15px; font-weight:bold;">
+                    Total Records: <t t-esc="len(docs)"/>
+                </p>
+            </div>
+        </t>
+    </t>
+</template>
+</odoo>

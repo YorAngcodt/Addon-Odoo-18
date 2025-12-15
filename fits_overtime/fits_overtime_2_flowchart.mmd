@@ -1,0 +1,127 @@
+graph TD
+    %% Setup & Configuration Phase
+    A[Admin Login] --> B[Create Overtime Configuration]
+    B --> C{Define Configuration Details}
+    C --> D[Set Configuration Name]
+    C --> E[Set Valid Period<br/>date_start - date_end]
+    C --> F[Create OT Lines]
+    
+    F --> G[OT1 Line<br/>17:00-19:00]
+    F --> H[OT2 Line<br/>19:00-22:00]
+    F --> I[OT3 Line<br/>22:00-24:00]
+    
+    G --> J{Validation Check}
+    H --> J
+    I --> J
+    
+    J -->|Valid Sequence| K[Status: Draft]
+    J -->|Invalid| L[Show Validation Errors<br/>- Sequence must be OT1→OT2→OT3<br/>- No overlaps<br/>- Valid time ranges]
+    L --> F
+    
+    K --> M[Action: Activate Configuration]
+    M --> N[Status: Active]
+    
+    %% Employee Assignment
+    N --> O[Assign to Employee]
+    O --> P[hr.employee.overtime_configuration_id]
+    
+    %% Request Creation Phase
+    P --> Q[Employee Creates Request]
+    Q --> R[Fill Request Details]
+    R --> S[Select Employee]
+    R --> T[Set Start DateTime]
+    R --> U[Set End DateTime]
+    R --> V[Add Description]
+    
+    S --> W{Auto Validation}
+    T --> W
+    U --> W
+    V --> W
+    
+    W -->|Valid| X[Status: Draft]
+    W -->|Invalid| Y[Show Errors<br/>- End must be after Start<br/>- Employee must have config<br/>- Config must be active]
+    Y --> R
+    
+    %% Calculation Engine
+    X --> Z[Trigger: _compute_overtime_hours]
+    Z --> AA[Get Employee Configuration]
+    AA --> BB{Configuration Check}
+    
+    BB -->|No Config| CC[ot1_hours = 0<br/>ot2_hours = 0<br/>ot3_hours = 0<br/>debug_info = 'No config']
+    BB -->|Config Inactive| DD[debug_info = 'Config not active']
+    BB -->|Config Expired| EE[debug_info = 'Config expired']
+    BB -->|Valid Config| FF[calculate_overtime_for_request]
+    
+    %% Core Calculation Logic
+    FF --> GG[Convert UTC to Local Time<br/>UTC + 7 hours for WIB]
+    GG --> HH[Extract Time Float<br/>hour + minute/60 + second/3600]
+    HH --> II[Handle Cross-day Scenarios<br/>if end_date > start_date: end_time += 24*days]
+    
+    II --> JJ[For Each Configuration Line]
+    JJ --> KK[Calculate Overlap<br/>overlap_start = max(request_start, line_start)<br/>overlap_end = min(request_end, line_end)]
+    
+    KK --> LL{Has Overlap?<br/>overlap_start < overlap_end}
+    LL -->|Yes| MM[overlap_duration = overlap_end - overlap_start]
+    LL -->|No| NN[overlap_duration = 0]
+    
+    MM --> OO{Line Type?}
+    NN --> PP[Next Line]
+    
+    OO -->|OT1| QQ[ot1_hours += overlap_duration]
+    OO -->|OT2| RR[ot2_hours += overlap_duration]
+    OO -->|OT3| SS[ot3_hours += overlap_duration]
+    
+    QQ --> PP
+    RR --> PP
+    SS --> PP
+    
+    PP --> TT{More Lines?}
+    TT -->|Yes| JJ
+    TT -->|No| UU[Round to 2 Decimal Places<br/>Calculate Total<br/>Generate Debug Message]
+    
+    UU --> VV[Update Request Fields<br/>ot1_hours, ot2_hours, ot3_hours<br/>overtime_breakdown_total<br/>calculation_debug_info]
+    
+    %% Request Workflow
+    VV --> WW[Employee Reviews Calculation]
+    WW --> XX[Action: Submit Request]
+    XX --> YY[Status: Submitted]
+    
+    YY --> ZZ[Manager Reviews Request]
+    ZZ --> AAA{Manager Decision}
+    
+    AAA -->|Approve| BBB[Action: Approve<br/>Status: Approved]
+    AAA -->|Reject| CCC[Action: Reject<br/>Status: Rejected]
+    AAA -->|Need Changes| DDD[Action: Set to Draft<br/>Status: Draft]
+    
+    DDD --> WW
+    
+    %% Configuration Management
+    N --> EEE[Auto-expire Check<br/>Daily/On Access]
+    EEE --> FFF{date_end < today?}
+    FFF -->|Yes| GGG[Auto-expire<br/>Status: Expired]
+    FFF -->|No| HHH[Keep Active]
+    
+    %% Error Handling & Debugging
+    CC --> III[Display in UI<br/>calculation_debug_info field]
+    DD --> III
+    EE --> III
+    VV --> III
+    
+    %% UI Display
+    BBB --> JJJ[Display in List View<br/>- Employee, DateTime, Hours<br/>- OT1, OT2, OT3 breakdown<br/>- Status badges]
+    CCC --> JJJ
+    
+    JJJ --> KKK[Form View Details<br/>- Employee info<br/>- Configuration status<br/>- Calculation breakdown<br/>- Debug information]
+    
+    %% Styling
+    classDef configPhase fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef requestPhase fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef calcPhase fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    classDef workflowPhase fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef errorPhase fill:#ffebee,stroke:#b71c1c,stroke-width:2px
+    
+    class A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P configPhase
+    class Q,R,S,T,U,V,W,X,Y requestPhase
+    class Z,AA,BB,FF,GG,HH,II,JJ,KK,LL,MM,NN,OO,PP,QQ,RR,SS,TT,UU,VV calcPhase
+    class WW,XX,YY,ZZ,AAA,BBB,CCC,DDD,EEE,FFF,GGG,HHH workflowPhase
+    class CC,DD,EE,III,Y,L errorPhase

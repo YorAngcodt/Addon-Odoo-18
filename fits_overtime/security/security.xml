@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ================= Category Baru di Human Resources ================= -->
+    <record id="module_category_overtime" model="ir.module.category">
+        <field name="name">Overtime</field>
+        <field name="description">Overtime Management Access Rights</field>
+        <field name="sequence">20</field>
+        <field name="parent_id" ref="base.module_category_human_resources"/>
+    </record>
+
+    <!-- ================= Security Groups ================= -->
+    <record id="group_overtime_user" model="res.groups">
+        <field name="name">User</field>
+        <field name="category_id" ref="module_category_overtime"/>
+    </record>
+
+    <record id="group_overtime_manager" model="res.groups">
+        <field name="name">Manager</field>
+        <field name="category_id" ref="module_category_overtime"/>
+        <field name="implied_ids" eval="[(4, ref('fits_overtime.group_overtime_user'))]"/>
+    </record>
+
+    <!-- ================= Record Rules ================= -->
+    <record id="employee_rule_user" model="ir.rule">
+        <field name="name">Employee: User Own</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="groups" eval="[(6,0,[ref('fits_overtime.group_overtime_user')])]"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+    </record>
+
+    <record id="employee_rule_manager" model="ir.rule">
+        <field name="name">Employee: Manager All</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="groups" eval="[(6,0,[ref('fits_overtime.group_overtime_manager')])]"/>
+        <field name="domain_force">[(1,'=',1)]</field>
+    </record>
+</odoo>

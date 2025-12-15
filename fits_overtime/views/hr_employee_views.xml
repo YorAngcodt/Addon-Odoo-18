@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extend Employee Form View -->
+    <record id="view_employee_form_overtime" model="ir.ui.view">
+        <field name="name">hr.employee.form.overtime</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Section Overtime Configuration di tab Settings -->
+            <xpath expr="//page[@name='hr_settings']" position="inside">
+                <group string="Overtime Configuration" col="2">
+                    <group>
+                        <field name="overtime_configuration_id"
+                               domain="[('status', '=', 'active')]"
+                               options="{'no_create': True}"/>
+                    </group>
+                </group>
+            </xpath>
+
+            <!-- Tab Overtime History -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Overtime History" name="overtime_history">
+                    <field name="overtime_request_ids" create="0" edit="0" delete="0">
+                        <list string="Overtime Requests">
+                            <field name="name"/>
+                            <field name="start_datetime"/>
+                            <field name="end_datetime"/>
+                            <field name="total_hours"/>
+                            <field name="status"/>
+                            <field name="request_day_type"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
